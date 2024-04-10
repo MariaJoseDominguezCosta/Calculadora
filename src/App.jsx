@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
 
 const Node = ({ value, left, right }) => {
   return (
-    <div>
+    <div className="node">
       <span>{value}</span>
-      {left && <div style={{ marginLeft: '20px' }}>{left}</div>}
-      {right && <div style={{ marginLeft: '20px' }}>{right}</div>}
+      {left && <div className="child">{left}</div>}
+      {right && <div className="child">{right}</div>}
     </div>
   );
 };
 
 const Calculator = () => {
-  const [expression, setExpression] = useState('');
-  const [result, setResult] = useState('');
+  const [expression, setExpression] = useState("");
+  const [result, setResult] = useState("");
   const [lexicalAnalyzer, setLexicalAnalyzer] = useState([]);
   const [tree, setTree] = useState(null);
 
@@ -22,8 +22,8 @@ const Calculator = () => {
   };
 
   const clear = () => {
-    setExpression('');
-    setResult('');
+    setExpression("");
+    setResult("");
     setLexicalAnalyzer([]);
     setTree(null);
   };
@@ -39,20 +39,6 @@ const Calculator = () => {
     } catch (error) {
       setResult(`Error: ${error.message}`);
     }
-  };
-
-  const buildExpressionTree = (tokens) => {
-    const stack = [];
-    for (let token of tokens) {
-      if (token.match(/\d+/)) {
-        stack.push({ value: token });
-      } else {
-        const right = stack.pop();
-        const left = stack.pop();
-        stack.push({ value: token, left, right });
-      }
-    }
-    return stack[0];
   };
 
   const evaluateExpressionTree = (node) => {
@@ -78,80 +64,103 @@ const Calculator = () => {
     }
   };
 
+  const buildExpressionTree = (tokens) => {
+    if (tokens.length === 1) {
+      return { value: tokens[0] };
+    }
+
+    const operators = ['+', '-', '*', '/'];
+    const operatorIndex = tokens.findIndex(token => operators.includes(token));
+    const operator = tokens[operatorIndex];
+    
+    const leftTokens = tokens.slice(0, operatorIndex);
+    const rightTokens = tokens.slice(operatorIndex + 1);
+
+    return {
+      value: operator,
+      left: buildExpressionTree(leftTokens),
+      right: buildExpressionTree(rightTokens)
+    };
+  };
+    
+
   const renderTree = (node) => {
     if (!node) return null;
     return (
       <Node
-      value={node.value}
-      left={node.left ? renderTree(node.left) : null}
-      right={node.right ? renderTree(node.right) : null}
+        value={node.value}
+        left={renderTree(node.left)}
+        right={renderTree(node.right)}
       />
     );
   };
+
   return (
     <>
-      <table className='calculadora'>
-        <tr>
-          <td colSpan='4'>
-            <input type='text' value={expression} readOnly />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <button onClick={() => handleButtonClick('7')}>7</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('8')}>8</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('9')}>9</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('/')}>/</button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <button onClick={() => handleButtonClick('4')}>4</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('5')}>5</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('6')}>6</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('*')}>*</button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <button onClick={() => handleButtonClick('1')}>1</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('2')}>2</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('3')}>3</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('-')}>-</button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <button onClick={calculate}>=</button>
-          </td>
-          <td>
-            <button onClick={clear}>C</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('0')}>0</button>
-          </td>
-          <td>
-            <button onClick={() => handleButtonClick('+')}>+</button>
-          </td>
-        </tr>
+      <table className="calculadora">
+        <tbody>
+          <tr>
+            <td colSpan="4">
+              <input type="text" value={expression} readOnly />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button onClick={() => handleButtonClick("7")}>7</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("8")}>8</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("9")}>9</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("/")}>/</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button onClick={() => handleButtonClick("4")}>4</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("5")}>5</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("6")}>6</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("*")}>*</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button onClick={() => handleButtonClick("1")}>1</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("2")}>2</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("3")}>3</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("-")}>-</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button onClick={calculate}>=</button>
+            </td>
+            <td>
+              <button onClick={clear}>C</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("0")}>0</button>
+            </td>
+            <td>
+              <button onClick={() => handleButtonClick("+")}>+</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <div>
         Result: {result}
