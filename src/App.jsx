@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 
+// eslint-disable-next-line react/prop-types
 const Node = ({ value, left, right }) => {
   return (
     <div className="node">
@@ -34,35 +35,57 @@ const Calculator = () => {
       setLexicalAnalyzer(tokens);
       const tree = buildExpressionTree(tokens);
       setTree(tree);
-      let total = evaluateExpressionTree(tree);
-      setResult(total);
+      let total = parseFloat(tokens[0]);
+      for (let i = 1; i < tokens.length; i += 2) {
+        const operator = tokens[i];
+        const operand = parseFloat(tokens[i + 1]);
+        switch (operator) {
+          case '+':
+            total += operand;
+            break;
+          case '-':
+            total -= operand;
+            break;
+          case '*':
+            total *= operand;
+            break;
+          case '/':
+            if (operand === 0) {
+              throw new Error('Cannot divide by zero');
+            }
+            total /= operand;
+            break;
+          default:
+            throw new Error('Invalid operator');
+        }
+      }      setResult(total);
     } catch (error) {
       setResult(`Error: ${error.message}`);
     }
   };
 
-  const evaluateExpressionTree = (node) => {
-    if (!node.left && !node.right) {
-      return parseFloat(node.value);
-    }
-    const leftValue = evaluateExpressionTree(node.left);
-    const rightValue = evaluateExpressionTree(node.right);
-    switch (node.value) {
-      case '+':
-        return leftValue + rightValue;
-      case '-':
-        return leftValue - rightValue;
-      case '*':
-        return leftValue * rightValue;
-      case '/':
-        if (rightValue === 0) {
-          throw new Error('Cannot divide by zero');
-        }
-        return leftValue / rightValue;
-      default:
-        throw new Error('Invalid operator');
-    }
-  };
+  // const evaluateExpressionTree = (node) => {
+  //   if (!node.left && !node.right) {
+  //     return parseFloat(node.value);
+  //   }
+  //   const leftValue = evaluateExpressionTree(node.left);
+  //   const rightValue = evaluateExpressionTree(node.right);
+  //   switch (node.value) {
+  //     case '+':
+  //       return leftValue + rightValue;
+  //     case '-':
+  //       return leftValue - rightValue;
+  //     case '*':
+  //       return leftValue * rightValue;
+  //     case '/':
+  //       if (rightValue === 0) {
+  //         throw new Error('Cannot divide by zero');
+  //       }
+  //       return leftValue / rightValue;
+  //     default:
+  //       throw new Error('Invalid operator');
+  //   }
+  // };
 
   const buildExpressionTree = (tokens) => {
     if (tokens.length === 1) {
